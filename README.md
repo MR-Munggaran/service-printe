@@ -18,8 +18,8 @@ Pastikan sistem Anda memenuhi persyaratan berikut:
 
 ### 1. Clone Repositori
 ```bash
-git clone https://github.com/[NamaPengguna]/[NamaRepositori].git
-cd [NamaRepositori]
+git clone https://github.com/MR-Munggaran/service-printe.git
+cd service-printe
 ```
 ### 2. Instal Dependensi
 ```bash
