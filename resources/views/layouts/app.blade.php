@@ -72,6 +72,7 @@
 
     <!-- Bootstrap core JavaScript-->
     @include("layouts.javascript")
+    @stack('scripts')
 
 </body>
 

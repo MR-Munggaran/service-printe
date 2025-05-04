@@ -4,12 +4,26 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Customer;
+use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class CustomerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $customers = Customer::latest()->paginate(10);
+        $query = Customer::query();
+    
+        // Filter berdasarkan nama
+        if ($request->filled('name')) {
+            $query->where('name', 'like', "%{$request->name}%");
+        }
+        if ($request->filled('NIK')) {
+            $query->where('NIK', 'like', "%{$request->NIK}%");
+        }
+    
+    
+        $customers = $query->latest()->paginate(10)->appends($request->only(['name', 'NIK']));
+    
         return view('customers.index', compact('customers'));
     }
 

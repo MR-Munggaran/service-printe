@@ -8,10 +8,38 @@ use App\Models\Category;
 
 class ItemController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $items = Item::with('category')->latest()->paginate(10);
-        return view('items.index', compact('items'));
+        // Query dasar dengan eager loading kategori
+        $query = Item::with('category');
+    
+        // Filter berdasarkan nama barang
+        if ($request->filled('name')) {
+            $query->where('name', 'like', "%{$request->name}%");
+        }
+    
+        // Filter berdasarkan merk
+        if ($request->filled('brand')) {
+            $query->where('brand', 'like', "%{$request->brand}%");
+        }
+    
+        // Filter berdasarkan kategori
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+    
+        // Filter berdasarkan stok (misalnya: hanya tampilkan barang dengan stok kosong)
+        if ($request->has('zero_stock') && $request->zero_stock == 1) {
+            $query->where('stock', 0);
+        }
+    
+        // Ambil semua kategori untuk dropdown filter
+        $categories = Category::all();
+    
+        // Paginasi
+        $items = $query->latest()->paginate(10)->appends($request->only(['name', 'brand', 'category_id', 'zero_stock']));
+    
+        return view('items.index', compact('items', 'categories'));
     }
 
     public function create()

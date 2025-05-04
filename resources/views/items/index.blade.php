@@ -25,9 +25,43 @@
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Daftar Barang</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Daftar Barang</h6>
+            </div>
+            <div class="card-body">
+            <div class="mb-4">
+            <form method="GET" action="{{ route('items.index') }}" class="form-inline">
+                <div class="form-group mr-2">
+                    <input type="text" name="name" class="form-control" 
+                        placeholder="Cari nama barang" 
+                        value="{{ request('name') }}">
+                </div>
+                <div class="form-group mr-2">
+                    <input type="text" name="brand" class="form-control" 
+                        placeholder="Cari merk" 
+                        value="{{ request('brand') }}">
+                </div>
+                <div class="form-group mr-2">
+                    <select name="category_id" class="form-control">
+                        <option value="">-- Semua Kategori --</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" 
+                                {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group mr-2">
+                    <div class="form-check">
+                        <input type="checkbox" name="zero_stock" value="1" id="zeroStockFilter"
+                            {{ request('zero_stock') == 1 ? 'checked' : '' }} class="form-check-input">
+                        <label for="zeroStockFilter" class="form-check-label">Stok Kosong</label>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mr-2">Filter</button>
+                <a href="{{ route('items.index') }}" class="btn btn-secondary">Reset</a>
+            </form>
         </div>
-        <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>

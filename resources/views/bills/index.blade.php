@@ -26,6 +26,42 @@
             <h6 class="m-0 font-weight-bold text-primary">Daftar Nota</h6>
         </div>
         <div class="card-body">
+            <div class="mb-4">
+                <form method="GET" action="{{ route('bills.index') }}" class="form-inline">
+                    <div class="form-group mr-2">
+                        <input type="text" name="item_name" class="form-control" 
+                            placeholder="Cari nama barang" 
+                            value="{{ request('item_name') }}">
+                    </div>
+                    <div class="form-group mr-2">
+                        <input type="text" name="customer_name" class="form-control" 
+                            placeholder="Cari nama pelanggan" 
+                            value="{{ request('customer_name') }}">
+                    </div>
+                    <div class="form-group mr-2">
+                        <input type="month" name="period" class="form-control" 
+                            value="{{ request('period') }}">
+                    </div>
+                    <div class="form-group mr-2">
+                        <input type="number" name="min_amount" class="form-control" 
+                            placeholder="Min Jumlah" 
+                            value="{{ request('min_amount') }}" min="0">
+                    </div>
+                    <div class="form-group mr-2">
+                        <input type="number" name="max_amount" class="form-control" 
+                            placeholder="Max Jumlah" 
+                            value="{{ request('max_amount') }}" min="0">
+                    </div>
+                    <button type="submit" class="btn btn-primary mr-2">Filter</button>
+                    <a href="{{ route('bills.index') }}" class="btn btn-secondary mr-2">Reset</a>
+                    <a
+                        href="{{ route('bills.export', request()->only(['item_name','customer_name','period','min_amount','max_amount'])) }}"
+                        class="btn btn-success"
+                        >
+                        Export ke Excel
+                    </a>
+                </form>
+            </div>
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>

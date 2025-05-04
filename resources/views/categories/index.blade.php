@@ -28,6 +28,20 @@
             <h6 class="m-0 font-weight-bold text-primary">Daftar Kategori</h6>
         </div>
         <div class="card-body">
+            <div class="mb-4">
+            <form method="GET" action="{{ route('categories.index') }}" class="form-inline">
+                <div class="form-group mr-2">
+                    <input type="text" name="name" class="form-control" 
+                        placeholder="Cari nama kategori" 
+                        value="{{ request('name') }}">
+                </div>
+                <div class="form-group mr-2">
+                <input type="text" name="date_range" class="form-control pr-3" id="dateRangePicker">
+                </div>
+                <button type="submit" class="btn btn-primary mr-2">Filter</button>
+                <a href="{{ route('categories.index') }}" class="btn btn-secondary">Reset</a>
+            </form>
+        </div>
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
@@ -73,3 +87,22 @@
     </div>
 </div>
 @endsection
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script> <!-- Tambahkan ini -->
+<script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+<script>
+$(function() {
+    $('#dateRangePicker').daterangepicker({
+        locale: {
+            format: 'YYYY-MM-DD',
+            applyLabel: 'Terapkan',
+            cancelLabel: 'Batal',
+        },
+        drops: "down",
+        opens: "right"
+    });
+});
+</script>
+@endpush

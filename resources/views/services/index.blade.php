@@ -25,9 +25,41 @@
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Daftar Service</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Daftar Service</h6>
+            </div>
+            <div class="card-body">
+            <div class="mb-4">
+            <form method="GET" action="{{ route('services.index') }}" class="form-inline">
+                <div class="form-group mr-2">
+                    <input type="text" name="item_name" class="form-control" 
+                        placeholder="Cari nama barang" 
+                        value="{{ request('item_name') }}">
+                </div>
+                <div class="form-group mr-2">
+                    <input type="text" name="customer_name" class="form-control" 
+                        placeholder="Cari nama pelanggan" 
+                        value="{{ request('customer_name') }}">
+                </div>
+                <div class="form-group mr-2">
+                    <select name="status" class="form-control">
+                        <option value="">-- Semua Status --</option>
+                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>Diproses</option>
+                        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Selesai</option>
+                    </select>
+                </div>
+                <div class="form-group mr-2">
+                    <input type="date" name="service_date" class="form-control" 
+                        value="{{ request('service_date') }}">
+                </div>
+                <button type="submit" class="btn btn-primary mr-2">Filter</button>
+                <a href="{{ route('services.index') }}" class="btn btn-secondary mr-2">Reset</a>
+                <a href="{{ route('services.export', request()->only(['item_name','customer_name','status','service_date'])) }}"
+                    class="btn btn-success">
+                    Export ke Excel
+                </a>
+            </form>
         </div>
-        <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>

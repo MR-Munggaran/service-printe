@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Http\Requests\ProfileUpdateRequest;
+use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
@@ -66,5 +68,42 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/');
+    }
+
+    public function showProfile()
+    {
+        $user = Auth::user();
+        return view('auth.profile', compact('user'));
+    }
+
+    // Update Profil
+    public function updateProfile(ProfileUpdateRequest $request)
+    {
+        $user = Auth::user();
+        
+        // Update data profil
+        $user->name = $request->name;
+        $user->email = $request->email;
+        
+        // Update password jika diisi
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+    
+        // Upload foto jika ada
+        if ($request->hasFile('photo')) {
+            // Hapus foto lama jika ada
+            if ($user->photo && Storage::exists('public/' . $user->photo)) {
+                Storage::delete('public/' . $user->photo);
+            }
+    
+            // Simpan foto baru
+            $path = $request->file('photo')->store('photos', 'public');
+            $user->photo = $path;
+        }
+    
+        $user->save();
+        
+        return redirect()->route('profile.show')->with('success', 'Profil berhasil diperbarui');
     }
 }

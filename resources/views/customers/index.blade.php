@@ -28,6 +28,22 @@
             <h6 class="m-0 font-weight-bold text-primary">Daftar Pelanggan</h6>
         </div>
         <div class="card-body">
+            <div class="mb-4">
+                <form method="GET" action="{{ route('customers.index') }}" class="form-inline">
+                    <div class="form-group mr-2">
+                        <input type="text" name="name" class="form-control" 
+                            placeholder="Cari nama pelanggan" 
+                            value="{{ request('name') }}">
+                    </div>
+                    <div class="form-group mr-2">
+                        <input type="text" name="NIK" class="form-control" 
+                            placeholder="Cari nik pelanggan" 
+                            value="{{ request('NIK') }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary mr-2">Filter</button>
+                    <a href="{{ route('customers.index') }}" class="btn btn-secondary">Reset</a>
+                </form>
+            </div>
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
