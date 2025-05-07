@@ -1,62 +1,54 @@
 <?php
 
+// routes/web.php
+
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\BillController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UserController;
 
-// Show Login Form (GET)
-Route::get('/', [AuthController::class, 'showLoginForm'])->name('login.show');
-
-// Process Login (POST)
-Route::post('/login', [AuthController::class, 'login'])->name('login.store');
-
-// Show Register Form (GET)
+// Public routes
+Route::get('/', function () { return view('landing_page');});
+Route::get('/login-user', function () { return view('auth/login-user');})->name('login.user');
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login.show');
+Route::post('/login', [AuthController::class, 'login'])
+     ->middleware('throttle:5,1')
+     ->name('login.store');
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register.show');
-
-// Process Registration (POST)
 Route::post('/register', [AuthController::class, 'register'])->name('register.store');
 
+// Protected routes
 Route::middleware('auth')->group(function () {
-    // Export Route (Harus di atas agar tidak tertabrak route show)
-    Route::get('/export-bills-xlsx', [BillController::class, 'exportXlsx'])->name('bills.export');
+    // Dashboard per role
+    Route::get('/dashboard',            [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/owner',      [DashboardController::class, 'owner'])->name('dashboard.owner');
+    Route::get('/dashboard/admin',      [DashboardController::class, 'admin'])->name('dashboard.admin');
+    Route::get('/dashboard/staff',      [DashboardController::class, 'staff'])->name('dashboard.staff');
 
-    // Index
-    Route::get('/bills', [BillController::class, 'index'])->name('bills.index');
-    
-    // Create Form
-    Route::get('/bills/create', [BillController::class, 'create'])->name('bills.create');
-    
-    // Store
-    Route::post('/bills', [BillController::class, 'store'])->name('bills.store');
-    
-    // Show
-    Route::get('/bills/{bill}', [BillController::class, 'show'])->name('bills.show');
-    
-    // Edit Form
-    Route::get('/bills/{bill}/edit', [BillController::class, 'edit'])->name('bills.edit');
-    
-    // Update
-    Route::put('/bills/{bill}', [BillController::class, 'update'])->name('bills.update');
-    
-    // Delete
-    Route::delete('/bills/{bill}', [BillController::class, 'destroy'])->name('bills.destroy');
+    // Export XLSX
+    Route::get('/export-services-xlsx',    [ServiceController::class,     'exportXlsx'])->name('services.export');
+    Route::get('/export-suppliers-xlsx',   [SupplierController::class,    'exportXlsx'])->name('suppliers.export');
+    Route::get('/export-transactions-xlsx',[TransactionController::class, 'exportXlsx'])->name('transactions.export');
 
-    Route::get('/export-services-xlsx', [ServiceController::class, 'exportXlsx'])
-     ->name('services.export');
+    // Resourceful controllers
+    Route::resource('categories',   CategoryController::class);
+    Route::resource('items',        ItemController::class);
+    Route::resource('customers',    CustomerController::class);
+    Route::resource('services',     ServiceController::class);
+    Route::resource('suppliers',    SupplierController::class);
+    Route::resource('transactions', TransactionController::class);
+    Route::resource('users', UserController::class);
 
-    
-    Route::resource('categories', CategoryController::class);
-    Route::resource('items', ItemController::class);
-    Route::resource('customers', CustomerController::class);
-    Route::resource('services', ServiceController::class);
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/profile', [AuthController::class, 'showProfile'])->name('profile.show');
-    Route::put('/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    // Profile & logout
+    Route::get ('/profile', [AuthController::class, 'showProfile'])->name('profile.show');
+    Route::put ('/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/logout',  [AuthController::class, 'logout'])->name('logout');
 });
+

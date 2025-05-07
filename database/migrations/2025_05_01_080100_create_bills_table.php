@@ -11,14 +11,31 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bills', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('item_id')->constrained('items');
-            $table->foreignId('customer_id')->constrained('customers');
-            $table->integer('amount');
-            $table->decimal('total', 10, 2);
-            $table->date('period');
-            $table->timestamps(); // tanggal_input = created_at
+        // migrations/xxxx_create_transactions_table.php
+        Schema::create('transactions', function (Blueprint $t) {
+            $t->id();
+            $t->string('invoice_no')->unique();
+            $t->foreignId('customer_id')->nullable()->constrained('customers')->onDelete('set null');
+            $t->foreignId('user_id')->constrained('users')->onDelete('cascade'); // kasir
+            $t->decimal('total', 10, 2);
+            $t->decimal('paid', 10, 2);
+            $t->decimal('change', 10, 2);
+            $t->decimal('discount', 10, 2)->default(0);
+            $t->decimal('grand_total', 10, 2);
+            $t->enum('payment_method', ['cash', 'card', 'transfer', 'ewallet'])->default('cash');
+            $t->enum('status', ['unpaid', 'paid', 'refunded'])->default('unpaid');
+            $t->timestamps();
+        });
+
+        // migrations/xxxx_create_transaction_items_table.php
+        Schema::create('transaction_items', function (Blueprint $t) {
+            $t->id();
+            $t->foreignId('transaction_id')->constrained()->onDelete('cascade');
+            $t->nullableMorphs('itemable'); // bisa Item atau Service
+            $t->integer('quantity')->default(1);
+            $t->decimal('price', 10, 2);
+            $t->decimal('subtotal', 10, 2);
+            $t->timestamps();
         });
     }
 

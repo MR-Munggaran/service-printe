@@ -2,28 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreCustomerRequest;
+use App\Http\Requests\UpdateCustomerRequest;
 use App\Models\Customer;
-use Illuminate\Support\Facades\Validator;
-use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
+
     public function index(Request $request)
     {
         $query = Customer::query();
-    
-        // Filter berdasarkan nama
+
         if ($request->filled('name')) {
             $query->where('name', 'like', "%{$request->name}%");
         }
         if ($request->filled('NIK')) {
             $query->where('NIK', 'like', "%{$request->NIK}%");
         }
-    
-    
-        $customers = $query->latest()->paginate(10)->appends($request->only(['name', 'NIK']));
-    
+
+        $customers = $query->latest()
+                           ->paginate(10)
+                           ->appends($request->only(['name', 'NIK']));
+
         return view('customers.index', compact('customers'));
     }
 
@@ -32,18 +33,11 @@ class CustomerController extends Controller
         return view('customers.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreCustomerRequest $request)
     {
-        $request->validate([
-            'name' => ['required', 'max:255'],
-            'address' => ['required'],
-            'telephone' => ['required', 'regex:/^[0-9\-\+]+$/'],
-            'email' => ['required', 'email', 'unique:customers'],
-            'NIK' => ['required', 'unique:customers'],
-        ]);
-
-        Customer::create($request->all());
-        return redirect()->route('customers.index')->with('success', 'Pelanggan berhasil ditambahkan');
+        Customer::create($request->validated());
+        return redirect()->route('customers.index')
+                         ->with('success', 'Pelanggan berhasil ditambahkan');
     }
 
     public function show(Customer $customer)
@@ -56,23 +50,17 @@ class CustomerController extends Controller
         return view('customers.edit', compact('customer'));
     }
 
-    public function update(Request $request, Customer $customer)
+    public function update(UpdateCustomerRequest $request, Customer $customer)
     {
-        $request->validate([
-            'name' => ['required', 'max:255'],
-            'address' => ['required'],
-            'telephone' => ['required', 'regex:/^[0-9\-\+]+$/'],
-            'email' => ['required', 'email', 'unique:customers,email,'.$customer->id],
-            'NIK' => ['required', 'unique:customers,NIK,'.$customer->id],
-        ]);
-
-        $customer->update($request->all());
-        return redirect()->route('customers.index')->with('success', 'Pelanggan berhasil diupdate');
+        $customer->update($request->validated());
+        return redirect()->route('customers.index')
+                         ->with('success', 'Pelanggan berhasil diupdate');
     }
 
     public function destroy(Customer $customer)
     {
         $customer->delete();
-        return redirect()->route('customers.index')->with('success', 'Pelanggan berhasil dihapus');
+        return redirect()->route('customers.index')
+                         ->with('success', 'Pelanggan berhasil dihapus');
     }
 }

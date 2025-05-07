@@ -1,109 +1,128 @@
 <?php
 
+// app/Http/Controllers/AuthController.php
+
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
-use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
-    // Halaman Login
+    /** Show login form */
     public function showLoginForm()
     {
         return view('auth.login');
     }
 
-    // Proses Login
+    /** Process login */
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'email'    => ['required','email'],
             'password' => ['required'],
         ]);
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('/dashboard');
+            return redirect()->intended($this->redirectTo(Auth::user()));
         }
 
-        return back()->withErrors([
-            'email' => 'Email atau password salah',
-        ]);
+        return back()->withErrors(['email' => 'Email atau password salah']);
     }
 
-    // Halaman Registrasi
+    /** Determine post‐login redirect based on role */
+    protected function redirectTo(User $user)
+    {
+        if ($user->hasRole('owner')) {
+            return route('dashboard.owner');
+        }
+        if ($user->hasRole('admin')) {
+            return route('dashboard.admin');
+        }
+        if ($user->hasRole('staff')) {
+            return route('dashboard.staff');
+        }
+        return route('dashboard');
+    }
+
+    /** Show register form */
     public function showRegisterForm()
     {
         return view('auth.register');
     }
 
-    // Proses Registrasi
+    /** Process registration */
     public function register(Request $request)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:users'],
-            'password' => ['required', 'confirmed', 'min:6'],
+        $data = $request->validate([
+            'name'     => ['required','string','max:255'],
+            'email'    => ['required','email','unique:users'],
+            'password' => ['required','confirmed','min:6'],
         ]);
-    
+
         $user = User::create([
-            'name' => $request->name, // ✅ Perbaikan di sini
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'name'     => $data['name'],
+            'email'    => $data['email'],
+            'password' => Hash::make($data['password']),
         ]);
-    
+
+        // Assign default 'user' role
+        if ($role = Role::where('name', 'user')->first()) {
+            $user->roles()->attach($role);
+        }
+
         Auth::login($user);
-        return redirect('/dashboard');
+        return redirect($this->redirectTo($user));
     }
 
-    // Logout
+    /** Logout user */
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/');
+
+        return redirect()->route('login.show');
     }
 
+    /** Show profile page */
     public function showProfile()
     {
-        $user = Auth::user();
-        return view('auth.profile', compact('user'));
+        return view('auth.profile', ['user' => Auth::user()]);
     }
 
-    // Update Profil
+    /** Update profile */
     public function updateProfile(ProfileUpdateRequest $request)
     {
         $user = Auth::user();
-        
-        // Update data profil
-        $user->name = $request->name;
-        $user->email = $request->email;
-        
-        // Update password jika diisi
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
+        $data = $request->validated();
+
+        $user->fill([
+            'name'  => $data['name'],
+            'email' => $data['email'],
+        ]);
+
+        if (!empty($data['password'])) {
+            $user->password = Hash::make($data['password']);
         }
-    
-        // Upload foto jika ada
+
         if ($request->hasFile('photo')) {
-            // Hapus foto lama jika ada
-            if ($user->photo && Storage::exists('public/' . $user->photo)) {
-                Storage::delete('public/' . $user->photo);
+            // Hapus foto lama
+            if ($user->photo && Storage::exists('public/'.$user->photo)) {
+                Storage::delete('public/'.$user->photo);
             }
-    
-            // Simpan foto baru
-            $path = $request->file('photo')->store('photos', 'public');
-            $user->photo = $path;
+            $user->photo = $request->file('photo')->store('photos','public');
         }
-    
+
         $user->save();
-        
-        return redirect()->route('profile.show')->with('success', 'Profil berhasil diperbarui');
+
+        return redirect()->route('profile.show')
+                         ->with('success','Profil berhasil diperbarui');
     }
 }
