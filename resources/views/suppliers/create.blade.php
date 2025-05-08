@@ -21,19 +21,11 @@
         </div>
 
         <div class="form-group">
-          <label for="contact_person">Contact Person</label>
-          <input type="text" name="contact_person" id="contact_person"
-                 class="form-control @error('contact_person') is-invalid @enderror"
-                 value="{{ old('contact_person') }}">
-          @error('contact_person')<div class="invalid-feedback">{{ $message }}</div>@enderror
-        </div>
-
-        <div class="form-group">
-          <label for="phone">Telepon</label>
-          <input type="text" name="phone" id="phone"
-                 class="form-control @error('phone') is-invalid @enderror"
-                 value="{{ old('phone') }}">
-          @error('phone')<div class="invalid-feedback">{{ $message }}</div>@enderror
+          <label for="contact">Contact Person</label>
+          <input type="text" name="contact" id="contact"
+                 class="form-control @error('contact') is-invalid @enderror"
+                 value="{{ old('contact') }}">
+          @error('contact')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
 
         <div class="form-group">
@@ -42,14 +34,6 @@
                  class="form-control @error('email') is-invalid @enderror"
                  value="{{ old('email') }}">
           @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
-        </div>
-
-        <div class="form-group">
-          <label for="address">Alamat</label>
-          <textarea name="address" id="address"
-                    class="form-control @error('address') is-invalid @enderror"
-                    rows="3">{{ old('address') }}</textarea>
-          @error('address')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
 
         <div class="text-right">

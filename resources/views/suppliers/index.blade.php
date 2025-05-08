@@ -27,7 +27,6 @@
           <tr>
             <th>Nama</th>
             <th>Contact Person</th>
-            <th>Telepon</th>
             <th>Email</th>
             <th>Aksi</th>
           </tr>
@@ -36,8 +35,7 @@
           @forelse($suppliers as $s)
           <tr>
             <td>{{ $s->name }}</td>
-            <td>{{ $s->contact_person }}</td>
-            <td>{{ $s->phone }}</td>
+            <td>{{ $s->contact }}</td>
             <td>{{ $s->email }}</td>
             <td>
               <a href="{{ route('suppliers.show',$s) }}" class="btn btn-info btn-sm"><i class="fas fa-eye"></i></a>

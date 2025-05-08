@@ -13,8 +13,7 @@ class UserSeeder extends Seeder
         $users = [
             ['name'=>'Admin Utama','email'=>'admin@example.com','password'=>bcrypt('password'),'photo'=>null,'role'=>'admin'],
             ['name'=>'Owner Toko','email'=>'owner@example.com','password'=>bcrypt('password'),'photo'=>null,'role'=>'owner'],
-            ['name'=>'Staff Gudang','email'=>'staff@example.com','password'=>bcrypt('password'),'photo'=>null,'role'=>'staff'],
-            ['name'=>'user','email'=>'user@example.com','password'=>bcrypt('password'),'photo'=>null,'role'=>'user'],
+            ['name'=>'Staff Service','email'=>'staff@example.com','password'=>bcrypt('password'),'photo'=>null,'role'=>'staff'],
         ];
 
         foreach ($users as $u) {

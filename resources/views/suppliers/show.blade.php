@@ -11,10 +11,8 @@
     <div class="card-body">
       <table class="table table-borderless mb-0">
         <tr><th>Nama</th><td>: {{ $supplier->name }}</td></tr>
-        <tr><th>Contact Person</th><td>: {{ $supplier->contact_person }}</td></tr>
-        <tr><th>Telepon</th><td>: {{ $supplier->phone }}</td></tr>
+        <tr><th>Contact Person</th><td>: {{ $supplier->contact }}</td></tr>
         <tr><th>Email</th><td>: {{ $supplier->email }}</td></tr>
-        <tr><th>Alamat</th><td>: {{ $supplier->address }}</td></tr>
         <tr><th>Dibuat</th><td>: {{ $supplier->created_at->format('d M Y H:i') }}</td></tr>
         <tr><th>Diupdate</th><td>: {{ $supplier->updated_at->format('d M Y H:i') }}</td></tr>
       </table>

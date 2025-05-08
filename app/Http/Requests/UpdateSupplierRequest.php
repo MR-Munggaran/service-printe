@@ -8,10 +8,9 @@ class UpdateSupplierRequest extends FormRequest
 {
     public function authorize()
     {
-        return auth()->check() && (
-            auth()->user()->hasRole('admin') || auth()->user()->hasRole('owner')
-        );
+        return true;
     }
+
 
     public function rules(): array
     {

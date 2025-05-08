@@ -12,7 +12,7 @@
       <form method="POST" action="{{ route('users.store') }}">
         @csrf
 
-        <div class="form-group">
+        <div class="form-group mb-3">
           <label for="name">Nama</label>
           <input type="text" name="name" id="name"
                  class="form-control @error('name') is-invalid @enderror"
@@ -20,7 +20,7 @@
           @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
 
-        <div class="form-group">
+        <div class="form-group mb-3">
           <label for="email">Email</label>
           <input type="email" name="email" id="email"
                  class="form-control @error('email') is-invalid @enderror"
@@ -28,20 +28,20 @@
           @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
 
-        <div class="form-group">
+        <div class="form-group mb-3">
           <label for="password">Password</label>
           <input type="password" name="password" id="password"
                  class="form-control @error('password') is-invalid @enderror" required>
           @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
 
-        <div class="form-group">
+        <div class="form-group mb-3">
           <label for="password_confirmation">Konfirmasi Password</label>
           <input type="password" name="password_confirmation" id="password_confirmation"
                  class="form-control" required>
         </div>
 
-        <div class="form-group">
+        <div class="form-group mb-3">
           <label>Role</label>
           @foreach($roles as $role)
             <div class="form-check">
@@ -55,7 +55,8 @@
           @error('roles') <div class="text-danger">{{ $message }}</div> @enderror
         </div>
 
-        <div class="text-right">
+        <div class="d-flex justify-content-between">
+          <a href="{{ route('users.index') }}" class="btn btn-secondary">Kembali</a>
           <button type="submit" class="btn btn-primary">Simpan User</button>
         </div>
       </form>

@@ -30,16 +30,13 @@
                     <a class="nav-link" href="#about">About</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="#projects">Projects</a>
+                    <a class="nav-link" href="#projects">Service</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#products">Products</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="#signup">Contact</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center" href="{{ route('login.user') }}" title="Login">
-                        <img src="{{(asset('lp/assets/img/user.svg'))}}" alt="user" class="svg-white" width="20" height="20" />
-                      <span class="d-none d-lg-inline">Login</span>
-                    </a>
                   </li>
                 </ul>
               </div>
@@ -75,15 +72,15 @@
         <section class="projects-section bg-light" id="projects">
             <div class="container px-4 px-lg-5">
                 <!-- Featured Project Row-->
-                <!-- <div class="row gx-0 mb-4 mb-lg-5 align-items-center">
-                    <div class="col-xl-8 col-lg-7"><img class="img-fluid mb-3 mb-lg-0" src="assets/img/bg-masthead.jpg" alt="..." /></div>
+                <div class="row gx-0 mb-4 mb-lg-5 align-items-center">
+                    <div class="col-xl-8 col-lg-7"><img class="img-fluid mb-3 mb-lg-0" src="https://images.unsplash.com/photo-1708793699492-5fa208f52dcb?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="..." /></div>
                     <div class="col-xl-4 col-lg-5">
                         <div class="featured-text text-center text-lg-left">
                             <h4>Servis Printer EPSON</h4>
                             <p class="text-black-50 mb-0">Perbaikan dan perawatan printer EPSON semua tipe, termasuk penggantian head, maintenance rutin, dan solusi paper jam.</p>
                         </div>
                     </div>
-                </div> -->
+                </div>
                 <!-- Project One Row-->
                 <div class="row gx-0 mb-5 mb-lg-0 justify-content-center">
                     <div class="col-lg-6"><img class="img-fluid" src="https://images.unsplash.com/photo-1708793699492-5fa208f52dcb?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="..." /></div>
@@ -114,6 +111,51 @@
                 </div>
             </div>
         </section>
+        <!-- Products for Sale Section -->
+        <section class="projects-section bg-white" id="products">
+            <div class="container px-4 px-lg-5">
+                <div class="text-center mb-5">
+                    <h2 class="text-black">Produk yang Kami Jual</h2>
+                    <p class="text-muted">Berbagai perangkat dan aksesoris EPSON tersedia untuk Anda.</p>
+                </div>
+                <div class="row gx-4 gx-lg-5">
+                    <!-- Product 1 -->
+                    <div class="col-lg-4 mb-5">
+                        <div class="card h-100">
+                            <img src="https://mediaserver.goepson.com/ImConvServlet/imconv/d60560b00fe766443f873ee2fdc6da1b9be04f59/515Wx515H?use=productpictures&hybrisId=B2C&assetDescr=L3210-%281%29" class="card-img-top" alt="Printer EPSON">
+                            <div class="card-body">
+                                <h5 class="card-title">EPSON L3110 EcoTank Printer</h5>
+                                <p class="card-text">Printer hemat tinta dengan hasil cetak berkualitas tinggi. Cocok untuk rumah atau kantor kecil.</p>
+                                <p class="text-primary fw-bold">Rp 2.100.000</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product 2 -->
+                    <div class="col-lg-4 mb-5">
+                        <div class="card h-100">
+                            <img src="https://images.tokopedia.net/img/cache/700/product-1/2018/10/3/231447/231447_fc2b4258-2439-4c20-92c7-35e98b2524d7_1080_1080.jpg" class="card-img-top" alt="Tinta EPSON">
+                            <div class="card-body">
+                                <h5 class="card-title">Tinta Original EPSON 003</h5>
+                                <p class="card-text">Tinta original warna lengkap (CMYK) untuk hasil cetak tahan lama dan tajam.</p>
+                                <p class="text-primary fw-bold">Rp 95.000 / botol</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product 3 -->
+                    <div class="col-lg-4 mb-5">
+                        <div class="card h-100">
+                            <img src="https://mediaserver.goepson.com/ImConvServlet/imconv/b90786d670b246159f8e5ffbb797ad94ee30c6f0/1200Wx1200H?use=banner&hybrisId=B2C&assetDescr=V39II-%282%29" class="card-img-top" alt="Scanner EPSON">
+                            <div class="card-body">
+                                <h5 class="card-title">EPSON Perfection V39 Scanner</h5>
+                                <p class="card-text">Scanner flatbed berkualitas tinggi, ideal untuk dokumen dan foto resolusi tinggi.</p>
+                                <p class="text-primary fw-bold">Rp 1.250.000</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Signup-->
         <section class="signup-section" id="signup">
             <div class="container px-4 px-lg-5">

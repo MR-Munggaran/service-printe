@@ -21,16 +21,12 @@ class SupplierController extends Controller
         }
 
         if ($request->filled('contact_person')) {
-            $query->where('contact_person', 'like', "%{$request->contact_person}%");
-        }
-
-        if ($request->filled('phone')) {
-            $query->where('phone', 'like', "%{$request->phone}%");
+            $query->where('contact', 'like', "%{$request->contact}%");
         }
 
         $suppliers = $query->latest()
                            ->paginate(10)
-                           ->appends($request->only(['name', 'contact_person', 'phone']));
+                           ->appends($request->only(['name', 'contact_person']));
 
         return view('suppliers.index', compact('suppliers'));
     }
@@ -43,8 +39,8 @@ class SupplierController extends Controller
             $query->where('name', 'like', "%{$request->name}%");
         }
 
-        if ($request->filled('contact_person')) {
-            $query->where('contact_person', 'like', "%{$request->contact_person}%");
+        if ($request->filled('contact')) {
+            $query->where('contact_person', 'like', "%{$request->contact}%");
         }
 
         if ($request->filled('phone')) {

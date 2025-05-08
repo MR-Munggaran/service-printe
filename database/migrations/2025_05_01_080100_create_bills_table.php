@@ -16,7 +16,7 @@ return new class extends Migration
             $t->id();
             $t->string('invoice_no')->unique();
             $t->foreignId('customer_id')->nullable()->constrained('customers')->onDelete('set null');
-            $t->foreignId('user_id')->constrained('users')->onDelete('cascade'); // kasir
+            $t->foreignId('staff_id')->constrained('users')->onDelete('cascade'); // kasir
             $t->decimal('total', 10, 2);
             $t->decimal('paid', 10, 2);
             $t->decimal('change', 10, 2);

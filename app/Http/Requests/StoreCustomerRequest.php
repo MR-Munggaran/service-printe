@@ -9,10 +9,9 @@ class StoreCustomerRequest extends FormRequest
 {
     public function authorize()
     {
-        return auth()->check() && (
-            auth()->user()->hasRole('admin') || auth()->user()->hasRole('staff')
-        );
+        return true;
     }
+
 
     public function rules()
     {

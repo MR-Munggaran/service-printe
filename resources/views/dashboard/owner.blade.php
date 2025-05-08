@@ -30,4 +30,75 @@
     'title' => 'Service','count' => $totalServices, 'icon' => 'fas fa-tools','color'=>'secondary'
   ])@endcomponent
 </div>
+<div class="row mt-4">
+    <div class="col-xl-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-success">Grafik Pendapatan Tahunan</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="revenueChart" style="height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Konversi data PHP ke JavaScript
+        const revenueData = @json($revenueData);
+        
+        // Format data untuk chart
+        const labels = revenueData.map(item => item.month);
+        const data = revenueData.map(item => item.revenue);
+
+        // Buat chart
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Total Pendapatan',
+                    data: data,
+                    borderColor: '#1cc88a',
+                    backgroundColor: '#1cc88a33',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'Rp ' + value.toLocaleString('id-ID');
+                            }
+                        },
+                        grid: {
+                            color: '#e3e3e3'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return ' Rp ' + context.parsed.y.toLocaleString('id-ID');
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
 @endsection

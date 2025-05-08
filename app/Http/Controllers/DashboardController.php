@@ -7,6 +7,7 @@ use App\Models\Item;
 use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Transaction;
+use Illuminate\Support\Facades\DB;
 use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
 
@@ -31,10 +32,21 @@ class DashboardController extends Controller
         $totalTransactions = Transaction::count();
         $totalRevenue      = Transaction::sum('grand_total');
         $totalServices     = Service::count();
-
+    
+        // Ambil data revenue per bulan
+        $revenueData = Transaction::select(
+                DB::raw('MONTHNAME(created_at) as month'),
+                DB::raw('SUM(grand_total) as revenue')
+            )
+            ->whereYear('created_at', date('Y'))
+            ->groupBy(DB::raw('MONTH(created_at)'), DB::raw('MONTHNAME(created_at)'))
+            ->orderBy(DB::raw('MONTH(created_at)'))
+            ->get();
+    
         return view('dashboard.owner', compact(
             'categoriesCount','itemsCount','customersCount',
-            'totalTransactions','totalRevenue','totalServices'
+            'totalTransactions','totalRevenue','totalServices',
+            'revenueData' // tambahkan ini
         ));
     }
 

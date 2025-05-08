@@ -13,21 +13,21 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\LandingPageController;
 
 // Public routes
-Route::get('/', function () { return view('landing_page');});
-Route::get('/login-user', function () { return view('auth/login-user');})->name('login.user');
+Route::get('/', [LandingPageController::class, 'index'])->name('landing');
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login.show');
 Route::post('/login', [AuthController::class, 'login'])
      ->middleware('throttle:5,1')
      ->name('login.store');
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register.show');
 Route::post('/register', [AuthController::class, 'register'])->name('register.store');
+Route::get('/dashboard',            [DashboardController::class, 'index'])->name('dashboard');
 
 // Protected routes
 Route::middleware('auth')->group(function () {
     // Dashboard per role
-    Route::get('/dashboard',            [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/owner',      [DashboardController::class, 'owner'])->name('dashboard.owner');
     Route::get('/dashboard/admin',      [DashboardController::class, 'admin'])->name('dashboard.admin');
     Route::get('/dashboard/staff',      [DashboardController::class, 'staff'])->name('dashboard.staff');

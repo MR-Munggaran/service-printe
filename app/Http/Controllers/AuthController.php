@@ -72,8 +72,7 @@ class AuthController extends Controller
             'password' => Hash::make($data['password']),
         ]);
 
-        // Assign default 'user' role
-        if ($role = Role::where('name', 'user')->first()) {
+        if ($role = Role::where('name', 'staff')->first()) {
             $user->roles()->attach($role);
         }
 

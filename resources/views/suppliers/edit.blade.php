@@ -21,11 +21,11 @@
         </div>
 
         <div class="form-group">
-          <label for="contact_person">Contact Person</label>
-          <input type="text" name="contact_person" id="contact_person"
-                 class="form-control @error('contact_person') is-invalid @enderror"
-                 value="{{ old('contact_person',$supplier->contact_person) }}">
-          @error('contact_person')<div class="invalid-feedback">{{ $message }}</div>@enderror
+          <label for="contact_person">Contact </label>
+          <input type="text" name="contact" id="contact"
+                 class="form-control @error('contact') is-invalid @enderror"
+                 value="{{ old('contact',$supplier->contact) }}">
+          @error('contact')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
 
         <div class="form-group">
@@ -44,13 +44,13 @@
           @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
 
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label for="address">Alamat</label>
           <textarea name="address" id="address"
                     class="form-control @error('address') is-invalid @enderror"
                     rows="3">{{ old('address',$supplier->address) }}</textarea>
           @error('address')<div class="invalid-feedback">{{ $message }}</div>@enderror
-        </div>
+        </div> -->
 
         <div class="text-right">
           <button type="submit" class="btn btn-warning">Update Supplier</button>

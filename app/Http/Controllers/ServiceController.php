@@ -70,15 +70,17 @@ class ServiceController extends Controller
                 foreach ($services as $svc) {
                     $writer->addRow(WriterEntityFactory::createRowFromArray([
                         $svc->id,
-                        $svc->item->name,
-                        $svc->customer?->name,
-                        $svc->staff?->name,
+                        $svc->item?->name ?? '-',
+                        $svc->customer?->name ?? '-',
+                        $svc->staff?->name ?? '-',
                         $svc->description,
                         $svc->diagnosis,
                         $svc->action_taken,
                         $svc->service_fee,
-                        $svc->service_date->format('Y-m-d'),
-                        ucfirst(str_replace('_',' ',$svc->status)),
+                        $svc->service_date 
+                            ? \Carbon\Carbon::parse($svc->service_date)->format('Y-m-d') 
+                            : '-',
+                        ucfirst(str_replace('_',' ', $svc->status)),
                     ]));
                 }
             });

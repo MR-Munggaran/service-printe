@@ -13,8 +13,9 @@ class StoreItemRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->check() && auth()->user()->hasRole('admin') || auth()->user()->hasRole('staff');
+        return true;
     }
+
 
     /**
      * Get the validation rules that apply to the request.
