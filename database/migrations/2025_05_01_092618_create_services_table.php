@@ -15,11 +15,16 @@ return new class extends Migration
             $table->id();
             $table->foreignId('item_id')->constrained()->onDelete('cascade');
             $table->foreignId('customer_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('staff_id')->nullable()->constrained('users')->onDelete('set null'); // teknisi
             $table->text('description');
+            $table->text('diagnosis')->nullable(); // hasil pemeriksaan teknisi
+            $table->text('action_taken')->nullable(); // apa yang diperbaiki/diganti
+            $table->decimal('service_fee', 10, 2)->default(0); // biaya jasa servis
             $table->date('service_date');
-            $table->enum('status', ['pending', 'in_progress', 'completed'])->default('pending');
+            $table->enum('status', ['pending', 'in_progress', 'waiting_parts', 'completed', 'cancelled'])->default('pending');
             $table->timestamps();
         });
+        
     }
 
     /**

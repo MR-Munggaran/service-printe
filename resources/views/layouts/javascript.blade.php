@@ -1,5 +1,6 @@
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
-<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="{{asset('vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
 
 <!-- Core plugin JavaScript-->
 <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js')}}"></script>
@@ -9,6 +10,7 @@
 
 <!-- Page level plugins -->
 <script src="{{asset('vendor/chart.js/Chart.min.js')}}"></script>
+
 
 <!-- Page level custom scripts -->
 <script src="{{asset('js/demo/chart-area-demo.js')}}"></script>

@@ -27,8 +27,18 @@
             <form method="POST" action="{{ route('register.store') }}">
                 @csrf
 
-                <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign in</h3>
+                <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Staff Registration</h3>
 
+                <div class="alert alert-warning" role="alert">
+                    <h4 class="alert-heading">Permintaan Khusus!</h4>
+                    <p>Untuk pembuatan akun Admin dapat hubungi owner!</p>
+                    <hr>
+                    <p class="mb-0">Silahkan hubungi Owner untuk membuat akun admin melalui:</p>
+                    <ul class="mt-2">
+                        <li>Email: owner@epson-service.com</li>
+                        <li>WhatsApp: +62 812-3456-7890</li>
+                    </ul>
+                </div>
 
                 <div data-mdb-input-init class="form-outline mb-4">
                     <input type="text" class="form-control form-control-lg @error('name') is-invalid @enderror"id="name" name="name" value="{{ old('name') }}" required />

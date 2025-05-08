@@ -2,59 +2,51 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreServiceRequest;
+use App\Http\Requests\UpdateServiceRequest;
 use App\Models\Service;
 use App\Models\Item;
 use App\Models\Customer;
 use Illuminate\Http\Request;
-use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
+use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 
 class ServiceController extends Controller
 {
+
     public function index(Request $request)
     {
-        // Query dasar dengan eager loading item dan customer
-        $query = Service::with(['item', 'customer']);
-    
-        // Filter berdasarkan nama barang
+        $query = Service::with(['item', 'customer', 'staff']);
+
         if ($request->filled('item_name')) {
-            $query->whereHas('item', function($q) use ($request) {
-                $q->where('name', 'like', "%{$request->item_name}%");
-            });
+            $query->whereHas('item', fn($q) => $q->where('name','like',"%{$request->item_name}%"));
         }
-    
-        // Filter berdasarkan nama pelanggan
         if ($request->filled('customer_name')) {
-            $query->whereHas('customer', function($q) use ($request) {
-                $q->where('name', 'like', "%{$request->customer_name}%");
-            });
+            $query->whereHas('customer', fn($q) => $q->where('name','like',"%{$request->customer_name}%"));
         }
-    
-        // Filter berdasarkan status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
-    
-        // Filter berdasarkan tanggal service (exact match)
         if ($request->filled('service_date')) {
             $query->whereDate('service_date', $request->service_date);
         }
-    
-        // Paginasi
-        $services = $query->latest()->paginate(10)->appends($request->only(['item_name', 'customer_name', 'status', 'service_date']));
-    
+
+        $services = $query->latest()
+                          ->paginate(10)
+                          ->appends($request->only(['item_name','customer_name','status','service_date']));
+
         return view('services.index', compact('services'));
     }
 
     public function exportXlsx(Request $request)
     {
-        // 1. Siapkan query dengan filter yang sama
-        $query = Service::with(['item', 'customer']);
+        $query = Service::with(['item', 'customer', 'staff']);
         if ($request->filled('item_name')) {
-            $query->whereHas('item', fn($q) => $q->where('name', 'like', "%{$request->item_name}%"));
+            $query->whereHas('item', fn($q) => $q->where('name','like',"%{$request->item_name}%"));
         }
         if ($request->filled('customer_name')) {
-            $query->whereHas('customer', fn($q) => $q->where('name', 'like', "%{$request->customer_name}%"));
+            $query->whereHas('customer', fn($q) => $q->where('name','like',"%{$request->customer_name}%"));
         }
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -63,29 +55,32 @@ class ServiceController extends Controller
             $query->whereDate('service_date', $request->service_date);
         }
 
-        // 2. Nama file
         $fileName = 'services_' . now()->format('Ymd_His') . '.xlsx';
 
-        // 3. Stream download via Laravel
-        return Response::streamDownload(function () use ($query) {
+        return Response::streamDownload(function() use ($query) {
             $writer = WriterEntityFactory::createXLSXWriter();
             $writer->openToFile('php://output');
 
-            // Header
+            // Header row
             $writer->addRow(WriterEntityFactory::createRowFromArray([
-                'ID', 'Nama Barang', 'Pelanggan', 'Deskripsi', 'Tanggal Service', 'Status'
+                'ID', 'Item', 'Customer', 'Staff', 'Description', 'Diagnosis', 'Action Taken', 'Fee', 'Service Date', 'Status'
             ]));
 
-            // Data per chunk
-            $query->chunk(500, function ($services) use ($writer) {
+            $query->chunk(500, function($services) use ($writer) {
                 foreach ($services as $svc) {
                     $writer->addRow(WriterEntityFactory::createRowFromArray([
                         $svc->id,
-                        $svc->item->name,
-                        $svc->customer?->name,
+                        $svc->item?->name ?? '-',
+                        $svc->customer?->name ?? '-',
+                        $svc->staff?->name ?? '-',
                         $svc->description,
-                        $svc->service_date->format('Y-m-d'),
-                        ucfirst(str_replace('_', ' ', $svc->status)),
+                        $svc->diagnosis,
+                        $svc->action_taken,
+                        $svc->service_fee,
+                        $svc->service_date 
+                            ? \Carbon\Carbon::parse($svc->service_date)->format('Y-m-d') 
+                            : '-',
+                        ucfirst(str_replace('_',' ', $svc->status)),
                     ]));
                 }
             });
@@ -96,29 +91,27 @@ class ServiceController extends Controller
             'Content-Disposition' => "attachment; filename=\"{$fileName}\"",
         ]);
     }
+
     public function create()
     {
         $items = Item::all();
         $customers = Customer::all();
-        return view('services.create', compact('items', 'customers'));
+        return view('services.create', compact('items','customers'));
     }
 
-    public function store(Request $request)
+    public function store(StoreServiceRequest $request)
     {
-        $request->validate([
-            'item_id' => ['required', 'exists:items,id'],
-            'customer_id' => ['nullable', 'exists:customers,id'],
-            'description' => ['required', 'string'],
-            'service_date' => ['required', 'date'],
-            'status' => ['required', 'in:pending,in_progress,completed'],
-        ]);
+        $data = $request->validated();
+        $data['staff_id'] = Auth::id();
+        Service::create($data);
 
-        Service::create($request->all());
-        return redirect()->route('services.index')->with('success', 'Service berhasil ditambahkan');
+        return redirect()->route('services.index')
+                         ->with('success','Service berhasil ditambahkan');
     }
 
     public function show(Service $service)
     {
+        $service->load(['item','customer','staff']);
         return view('services.show', compact('service'));
     }
 
@@ -126,26 +119,22 @@ class ServiceController extends Controller
     {
         $items = Item::all();
         $customers = Customer::all();
-        return view('services.edit', compact('service', 'items', 'customers'));
+        return view('services.edit', compact('service','items','customers'));
     }
 
-    public function update(Request $request, Service $service)
+    public function update(UpdateServiceRequest $request, Service $service)
     {
-        $request->validate([
-            'item_id' => ['required', 'exists:items,id'],
-            'customer_id' => ['nullable', 'exists:customers,id'],
-            'description' => ['required', 'string'],
-            'service_date' => ['required', 'date'],
-            'status' => ['required', 'in:pending,in_progress,completed'],
-        ]);
+        $data = $request->validated();
+        $service->update($data);
 
-        $service->update($request->all());
-        return redirect()->route('services.index')->with('success', 'Service berhasil diupdate');
+        return redirect()->route('services.index')
+                         ->with('success','Service berhasil diupdate');
     }
 
     public function destroy(Service $service)
     {
         $service->delete();
-        return redirect()->route('services.index')->with('success', 'Service berhasil dihapus');
+        return redirect()->route('services.index')
+                         ->with('success','Service berhasil dihapus');
     }
 }

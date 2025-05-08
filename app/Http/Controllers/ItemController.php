@@ -2,66 +2,74 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreItemRequest;
+use App\Http\Requests\UpdateItemRequest;
 use App\Models\Item;
 use App\Models\Category;
+use App\Models\StockHistory;
+use Illuminate\Http\Request;
 
 class ItemController extends Controller
 {
     public function index(Request $request)
     {
-        // Query dasar dengan eager loading kategori
         $query = Item::with('category');
-    
-        // Filter berdasarkan nama barang
+
         if ($request->filled('name')) {
             $query->where('name', 'like', "%{$request->name}%");
         }
-    
-        // Filter berdasarkan merk
+
         if ($request->filled('brand')) {
             $query->where('brand', 'like', "%{$request->brand}%");
         }
-    
-        // Filter berdasarkan kategori
+
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
         }
-    
-        // Filter berdasarkan stok (misalnya: hanya tampilkan barang dengan stok kosong)
+
         if ($request->has('zero_stock') && $request->zero_stock == 1) {
             $query->where('stock', 0);
         }
-    
-        // Ambil semua kategori untuk dropdown filter
+
         $categories = Category::all();
-    
-        // Paginasi
-        $items = $query->latest()->paginate(10)->appends($request->only(['name', 'brand', 'category_id', 'zero_stock']));
-    
+        $items = $query->latest()
+            ->paginate(10)
+            ->appends($request->only(['name', 'brand', 'category_id', 'zero_stock']));
+
         return view('items.index', compact('items', 'categories'));
     }
 
     public function create()
     {
         $categories = Category::all();
-        return view('items.create', compact('categories'));
+        return view('items.create', compact('categories')); 
     }
 
-    public function store(Request $request)
+    public function store(StoreItemRequest $request)
     {
-        $request->validate([
-            'category_id' => ['required', 'exists:categories,id'],
-            'name' => ['required', 'unique:items,name', 'max:255'],
-            'brand' => ['required', 'max:255'],
-            'purchase_price' => ['required', 'numeric', 'min:0'],
-            'selling_price' => ['required', 'numeric', 'min:0'],
-            'satuan_barang' => ['required', 'in:pcs,kg,ltr,pack,boks'],
-            'stock' => ['required', 'integer', 'min:0'],
+        $data = $request->validated();
+
+        // Hitung harga jual otomatis (markup 20%)
+        $data['selling_price'] = $data['purchase_price'] * 1.2;
+
+        // Upload foto barang jika ada
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('items', 'public');
+        }
+
+        // Buat item
+        $item = Item::create($data);
+
+        // Log perubahan stok awal
+        StockHistory::create([
+            'item_id'   => $item->id,
+            'old_stock' => 0,
+            'new_stock' => $item->stock,
+            'reason'    => 'Initial stock',
         ]);
 
-        Item::create($request->all());
-        return redirect()->route('items.index')->with('success', 'Barang berhasil ditambahkan');
+        return redirect()->route('items.index')
+                         ->with('success', 'Barang berhasil ditambahkan');
     }
 
     public function show(Item $item)
@@ -75,25 +83,46 @@ class ItemController extends Controller
         return view('items.edit', compact('item', 'categories'));
     }
 
-    public function update(Request $request, Item $item)
+    public function update(UpdateItemRequest $request, Item $item)
     {
-        $request->validate([
-            'category_id' => ['required', 'exists:categories,id'],
-            'name' => ['required', 'unique:items,name,'.$item->id, 'max:255'],
-            'brand' => ['required', 'max:255'],
-            'purchase_price' => ['required', 'numeric', 'min:0'],
-            'selling_price' => ['required', 'numeric', 'min:0'],
-            'satuan_barang' => ['required', 'in:pcs,kg,ltr,pack,boks'],
-            'stock' => ['required', 'integer', 'min:0'],
-        ]);
+        $data = $request->validated();
 
-        $item->update($request->all());
-        return redirect()->route('items.index')->with('success', 'Barang berhasil diupdate');
+        // Hitung ulang harga jual
+        $data['selling_price'] = $data['purchase_price'] * 1.2;
+
+        // Upload foto baru jika ada
+        if ($request->hasFile('image')) {
+            // Hapus foto lama
+            if ($item->image && \Storage::disk('public')->exists($item->image)) {
+                \Storage::disk('public')->delete($item->image);
+            }
+            $data['image'] = $request->file('image')->store('items', 'public');
+        }
+
+        // Cek perubahan stok
+        $oldStock = $item->stock;
+
+        // Update item
+        $item->update($data);
+
+        // Jika stok berubah, log perubahan
+        if ($oldStock !== $data['stock']) {
+            StockHistory::create([
+                'item_id'   => $item->id,
+                'old_stock' => $oldStock,
+                'new_stock' => $data['stock'],
+                'reason'    => 'Manual stock update',
+            ]);
+        }
+
+        return redirect()->route('items.index')
+                         ->with('success', 'Barang berhasil diupdate');
     }
 
     public function destroy(Item $item)
     {
         $item->delete();
-        return redirect()->route('items.index')->with('success', 'Barang berhasil dihapus');
+        return redirect()->route('items.index')
+                         ->with('success', 'Barang berhasil dihapus');
     }
 }
